@@ -1,0 +1,38 @@
+name: GhostBeat Cloud Burst Worker
+
+on:
+  repository_dispatch:
+    types: [render_burst_job]
+
+concurrency:
+  group: burst-job-${{ github.event.client_payload.job_id }}
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Runtime Dependencies
+        run: |
+          pip install --no-cache-dir aiohttp motor pymongo aiofiles
+
+      - name: Execute Studio Burst Render
+        env:
+          JOB_ID: ${{ github.event.client_payload.job_id }}
+          USER_ID: ${{ github.event.client_payload.user_id }}
+          FEATURE_KEY: ${{ github.event.client_payload.feature_key }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          DB_NAME: ${{ secrets.DB_NAME || 'ghostbeat_db' }}
+        run: |
+          python burst_runner.py
