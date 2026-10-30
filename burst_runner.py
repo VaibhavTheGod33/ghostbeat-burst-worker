@@ -127,7 +127,8 @@ async def render_dj_mix(
     energy_mult = [1.2, 1.0, 0.8][max(0, min(energy_idx, 2))]
     xfade_sec = round(max(2.5, base_xfade * energy_mult), 1)
 
-    cmd = ["ffmpeg", "-y"]
+    ffmpeg_bin = shutil.which("ffmpeg") or "ffmpeg"
+    cmd = [ffmpeg_bin, "-y"]
     for p in track_paths:
         cmd += ["-i", str(p)]
 
@@ -190,6 +191,13 @@ async def main() -> None:
         sys.exit(1)
 
     logger.info("⚡ GhostBeat Cloud Burst Worker starting for Job %s...", JOB_ID)
+
+    ffmpeg_bin = shutil.which("ffmpeg")
+    if not ffmpeg_bin:
+        logger.error("FFmpeg executable not found in system PATH.")
+        sys.exit(1)
+    logger.info("FFmpeg runtime verified at: %s", ffmpeg_bin)
+
     client = AsyncIOMotorClient(MONGO_URI)
     db = client[DB_NAME]
 
