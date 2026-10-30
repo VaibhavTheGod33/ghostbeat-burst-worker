@@ -88,8 +88,8 @@ async def send_audio_to_telegram(
     chat_id: int,
     audio_path: Path,
     caption: str,
-    title: str,
-    performer: str = "GhostBeat Studio Engine",
+    title: str = "DJ Mix Master",
+    performer: str = "GhostBeat",
 ) -> None:
     """Upload master MP3 back to the user via Telegram Bot API."""
     url = f"https://api.telegram.org/bot{bot_token}/sendAudio"
@@ -159,8 +159,8 @@ async def render_dj_mix(
         "-c:a", "libmp3lame",
         "-b:a", "320k",
         "-ar", "48000",
-        "-metadata", "artist=GhostBeat Cloud Studio",
-        "-metadata", "title=GhostBeat High-Power Master",
+        "-metadata", "artist=GhostBeat",
+        "-metadata", f"title=DJ Mix ({DJ_MIX_STYLES[max(0, min(style_idx, len(DJ_MIX_STYLES) - 1))]})",
         str(output_path),
     ]
 
@@ -259,12 +259,11 @@ async def main() -> None:
             total_sec = float(job.get("track_total_seconds") or 0)
 
             caption = (
-                f"🎚 <b>DJ Mix Studio Master Set</b>\n"
+                f"🎧 <b>DJ Mix Master</b>\n"
                 f"━━━━━━━━━━━━━━━━━━━━━━━━\n"
-                f"⚡ <b>Engine:</b> High-Power Cloud Core (7GB RAM)\n"
-                f"Tracks: <b>{len(local_tracks)}</b> | Total Duration: <b>{format_duration(total_sec)}</b>\n"
-                f"Style: <b>{style_name}</b> | Energy: <b>{energy_name}</b>\n"
-                f"<i>Seamless equal-power transitions · Zero clipping</i>"
+                f"🎵 <b>Tracks:</b> {len(local_tracks)} | <b>Duration:</b> {format_duration(total_sec)}\n"
+                f"🎚 <b>Style:</b> {style_name} · {energy_name}\n"
+                f"✨ <i>Studio Master · 320 kbps</i>"
             )
 
             await send_audio_to_telegram(
@@ -273,7 +272,8 @@ async def main() -> None:
                 chat_id=user_id,
                 audio_path=master_output,
                 caption=caption,
-                title=f"GhostBeat Set ({style_name})",
+                title=f"DJ Mix ({style_name})",
+                performer="GhostBeat",
             )
 
             finish_time = datetime.now(timezone.utc)
