@@ -22,7 +22,13 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Runtime Dependencies
+      - name: Install System Dependencies (FFmpeg)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg
+          ffmpeg -version | head -n 1
+
+      - name: Install Python Dependencies
         run: |
           pip install --no-cache-dir aiohttp motor pymongo aiofiles
 
